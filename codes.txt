@@ -1,0 +1,413 @@
+Here are the Python code solutions for each of the 20 problems.
+
+1. Grade Classifier
+def assign_grade(score: int) -> str:
+    """
+    Takes a numerical score and returns the corresponding letter grade.
+    """
+    if score >= 90:
+        return "A"
+    elif score >= 80:
+        return "B"
+    elif score >= 70:
+        return "C"
+    elif score >= 60:
+        return "D"
+    else:
+        return "F"
+
+# Example Usage:
+print(f"95 -> {assign_grade(95)}")
+print(f"82 -> {assign_grade(82)}")
+print(f"59 -> {assign_grade(59)}")
+
+2. Character Repeater
+def repeat_chars(text: str, n: int) -> str:
+    """
+    Returns a new string where every character from the original string 
+    is repeated n times.
+    """
+    new_string = ""
+    for char in text:
+        new_string += char * n
+    return new_string
+
+# Example Usage:
+print(f"'abc', 3 -> {repeat_chars('abc', 3)}")
+print(f"'Hi', 2 -> {repeat_chars('Hi', 2)}")
+
+3. Find First Occurrence
+def find_first(items: list, target) -> int:
+    """
+    Returns the index of the first occurrence of target in the list items.
+    If the target is not in the list, returns -1.
+    """
+    for i in range(len(items)):
+        if items[i] == target:
+            return i
+    return -1
+
+# Example Usage:
+print(f"['a', 'b', 'c', 'b'], 'b' -> {find_first(['a', 'b', 'c', 'b'], 'b')}")
+print(f"[1, 2, 3], 4 -> {find_first([1, 2, 3], 4)}")
+
+4. String Property Checker
+def validate_string(text: str) -> bool:
+    """
+    Returns True only if the input string has a length of 8 or more characters 
+    and contains the letter 'a' (case-insensitive).
+    """
+    has_min_length = len(text) >= 8
+    has_a = 'a' in text.lower()
+    return has_min_length and has_a
+
+# Example Usage:
+print(f"'fantastic' -> {validate_string('fantastic')}")
+print(f"'awesome' -> {validate_string('awesome')}")
+print(f"'wonderful' -> {validate_string('wonderful')}")
+
+5. Filter List by Length
+def filter_by_length(words: list[str], min_length: int) -> list[str]:
+    """
+    Takes a list of strings and a minimum length, and returns a new list 
+    containing only the strings that meet the minimum length requirement.
+    """
+    result = []
+    for word in words:
+        if len(word) >= min_length:
+            result.append(word)
+    return result
+
+# Example Usage:
+print(filter_by_length(["apple", "cat", "banana", "dog", "elephant"], 5))
+
+6. Sum of String Digits
+def sum_digits(number_str: str) -> int:
+    """
+    Takes a string of digits and returns the sum of all the digits as an integer.
+    """
+    total = 0
+    for digit_char in number_str:
+        total += int(digit_char)
+    return total
+
+# Example Usage:
+print(f"'1928' -> {sum_digits('1928')}")
+
+7. Extract Seniors from Tuple Data
+def get_seniors(people: list[tuple]) -> list[str]:
+    """
+    Returns a sorted list of names of people who are 65 years of age or older.
+    """
+    senior_names = []
+    for name, age, city in people:
+        if age >= 65:
+            senior_names.append(name)
+    return sorted(senior_names)
+
+# Example Usage:
+people_data = [("Alice", 30, "NY"), ("Bob", 70, "CA"), ("Charlie", 65, "TX"), ("David", 25, "FL")]
+print(get_seniors(people_data))
+
+8. Invert Dictionary
+def invert_mapping(mapping: dict) -> dict:
+    """
+    Takes a dictionary and returns a new dictionary where the keys and 
+    values have been swapped.
+    """
+    inverted_dict = {}
+    for key, value in mapping.items():
+        inverted_dict[value] = key
+    return inverted_dict
+
+# Example Usage:
+print(invert_mapping({'a': 'z', 'b': 'y', 'c': 'x'}))
+
+9. Sort Rectangles by Area
+def sort_rectangles_by_area(rectangles: list[dict]) -> list[dict]:
+    """
+    Sorts a list of rectangle dictionaries in ascending order based on their area.
+    """
+    return sorted(rectangles, key=lambda rect: rect['length'] * rect['width'])
+
+# Example Usage:
+rects = [{'length': 5, 'width': 5}, {'length': 3, 'width': 10}, {'length': 2, 'width': 5}]
+print(sort_rectangles_by_area(rects))
+
+10. Find Missing Sequence Numbers
+def find_missing(nums: list[int], n: int) -> set:
+    """
+    Returns a set of all the integers missing from a complete sequence from 1 to N.
+    """
+    complete_sequence = set(range(1, n + 1))
+    given_numbers = set(nums)
+    return complete_sequence.difference(given_numbers)
+
+# Example Usage:
+print(find_missing([1, 2, 5, 6], 8))
+
+11. Count Words Excluding Stopwords
+def count_frequent_words(text: str, stopwords: set[str]) -> dict:
+    """
+    Counts the frequency of words in a text, excluding a given set of stopwords.
+    The comparison is case-insensitive, and the resulting dictionary keys are lowercase.
+    """
+    word_counts = {}
+    words = text.split()
+    
+    for word in words:
+        # The example output shows keys that are not fully cleaned (e.g., 'sentence,')
+        # To match the example, we lowercase the word for the key.
+        # The check against stopwords is also case-insensitive.
+        key = word.lower()
+        if key not in stopwords:
+            word_counts[key] = word_counts.get(key, 0) + 1
+            
+    return word_counts
+
+# Example Usage:
+text_block = "This is a sample sentence, this is not a test."
+stopword_set = {"is", "a", "not"}
+print(count_frequent_words(text_block, stopword_set))
+
+12. Squares of Odd Numbers with List Comprehension
+# The problem asks for the expression itself. Here it is, wrapped in a small script.
+numbers = (1, 2, 3, 4, 5, 6)
+
+# The list comprehension expression
+squared_odds = [num**2 for num in numbers if num % 2 != 0]
+
+# Example Usage:
+print(f"Given numbers: {numbers}")
+print(f"Result of expression: {squared_odds}")
+
+13. Configurable Greeting Function
+def create_greeter(greeting: str = "Hello"):
+    """
+    A factory function that returns a new greeting function.
+    The returned function uses the greeting provided to the factory.
+    """
+    def greeter(name: str) -> str:
+        return f"{greeting}, {name}!"
+    
+    return greeter
+
+# Example Usage:
+say_hello = create_greeter()
+say_hola = create_greeter("Hola")
+
+print(say_hello("World"))
+print(say_hola("Mundo"))
+
+14. Student Class with Grade Management
+class Student:
+    """
+    A class to represent a student with a name and a private list of grades.
+    """
+    def __init__(self, name: str):
+        self.name = name
+        self._grades = []  # Private attribute for encapsulation
+
+    def add_grade(self, grade: int):
+        """Adds a grade (0-100) to the student's grade list."""
+        if 0 <= grade <= 100:
+            self._grades.append(grade)
+        else:
+            print("Invalid grade. Please enter a value between 0 and 100.")
+
+    def get_average(self) -> float:
+        """Calculates and returns the average of the student's grades."""
+        if not self._grades:
+            return 0.0
+        return sum(self._grades) / len(self._grades)
+
+# Example Usage:
+student1 = Student("Alice")
+student1.add_grade(90)
+student1.add_grade(80)
+print(f"{student1.name}'s average: {student1.get_average()}")
+
+15. File System Inheritance
+class FSItem:
+    """Base class for a file system item."""
+    def __init__(self, name: str):
+        self.name = name
+
+    def get_info(self) -> str:
+        return self.name
+
+class File(FSItem):
+    """A file, which is an FSItem with a size."""
+    def __init__(self, name: str, size: int):
+        super().__init__(name)
+        self.size = size
+
+    def get_info(self) -> str:
+        return f"{super().get_info()}, Size: {self.size}"
+
+class Document(File):
+    """A document, which is a File with an author."""
+    def __init__(self, name: str, size: int, author: str):
+        super().__init__(name, size)
+        self.author = author
+    
+    def get_info(self) -> str:
+        return f"{super().get_info()}, Author: {self.author}"
+
+# Example Usage:
+doc = Document(name="report.txt", size=1024, author="Alice")
+print(doc.get_info())
+
+16. Polymorphic Logger
+def process_logs(loggers: list, message: str):
+    """
+    Iterates through a list of objects and calls the 'log' method on any
+    object that has one (duck typing).
+    """
+    for obj in loggers:
+        # Check if the object has a 'log' attribute and if that attribute is callable
+        if hasattr(obj, 'log') and callable(getattr(obj, 'log')):
+            obj.log(message)
+
+# Example Classes for Demonstration
+class FileLogger:
+    def log(self, msg: str):
+        print(f"File: {msg}")
+
+class DbLogger:
+    def log(self, msg: str):
+        print(f"DB: {msg}")
+
+class NotALogger:
+    pass
+
+# Example Usage:
+loggers_list = [FileLogger(), NotALogger(), DbLogger()]
+process_logs(loggers_list, "System startup")
+
+17. Transaction Ledger Class
+class Ledger:
+    """A class to track a list of financial transactions."""
+    def __init__(self):
+        self._transactions = []
+
+    def add_transaction(self, amount: float):
+        """Adds a transaction amount to the ledger."""
+        self._transactions.append(amount)
+
+    def get_balance(self) -> float:
+        """Returns the sum of all transactions."""
+        return sum(self._transactions)
+
+    def get_negative_transactions(self) -> list:
+        """Returns a list of all transactions that are less than zero."""
+        return [t for t in self._transactions if t < 0]
+
+# Example Usage:
+ledger = Ledger()
+ledger.add_transaction(100.0)
+ledger.add_transaction(-25.5)
+ledger.add_transaction(-10.0)
+print(f"Current Balance: {ledger.get_balance()}")
+print(f"Negative Transactions: {ledger.get_negative_transactions()}")
+
+18. Premium User with Super()
+class User:
+    """A simple user class."""
+    def __init__(self, username: str):
+        self.username = username
+
+    def get_status(self) -> str:
+        return "Regular"
+
+class PremiumUser(User):
+    """A premium user that inherits from User."""
+    def __init__(self, username: str, tier: str):
+        super().__init__(username)  # Call the parent constructor
+        self.tier = tier
+
+    def get_status(self) -> str:
+        """Overrides the parent method to return the premium status."""
+        return f"Premium ({self.tier})"
+
+# Example Usage:
+user = User("guest")
+premium_user = PremiumUser("pro_user", "Gold")
+print(f"{user.username}'s status: {user.get_status()}")
+print(f"{premium_user.username}'s status: {premium_user.get_status()}")
+
+19. Dynamic Module-Based Calculator
+
+This problem requires two files.
+
+File 1: operations.py
+
+# File: operations.py
+
+def add(a, b):
+    """Returns the sum of a and b."""
+    return a + b
+
+def subtract(a, b):
+    """Returns the difference of a and b."""
+    return a - b
+
+File 2: main.py
+
+# File: main.py
+
+# Import specific functions from the operations module
+from operations import add, subtract
+
+# Use the imported functions
+result1 = add(10, 5)
+result2 = subtract(10, 5)
+
+print(f"Addition result: {result1}")
+print(f"Subtraction result: {result2}")
+
+20. Vending Machine State Management
+class VendingMachine:
+    """
+    Manages the state and logic of a vending machine.
+    """
+    def __init__(self, inventory: dict):
+        self.inventory = inventory
+
+    def purchase(self, item_name: str, money: float) -> str:
+        """
+        Processes a purchase request.
+        Checks for item availability, stock, and sufficient funds.
+        """
+        # Check if item exists in inventory
+        if item_name not in self.inventory:
+            return f"Item '{item_name}' not available."
+        
+        item = self.inventory[item_name]
+        price = item['price']
+        stock = item['stock']
+
+        # Check if item is in stock
+        if stock <= 0:
+            return "Out of stock."
+
+        # Check if money is sufficient
+        if money < price:
+            return f"Insufficient funds. Price is ${price:.2f}."
+
+        # Process successful purchase
+        self.inventory[item_name]['stock'] -= 1
+        change = money - price
+        return f"Dispensing {item_name}. Your change is ${change:.2f}."
+
+# Example Usage:
+inventory_data = {
+    'cola': {'price': 1.50, 'stock': 2},
+    'chips': {'price': 1.00, 'stock': 10}
+}
+vm = VendingMachine(inventory_data)
+
+print(vm.purchase('cola', 2.00))
+print(vm.purchase('chips', 0.75))
+print(vm.purchase('cola', 1.50))
+print(vm.purchase('cola', 1.50)) # This should be out of stock
