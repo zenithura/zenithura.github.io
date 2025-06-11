@@ -182,6 +182,18 @@ stopword_set = {"is", "a", "not"}
 print(count_frequent_words(text_block, stopword_set))`
     },
     {
+        title: "12. Squares of Odd Numbers with List Comprehension",
+        code: `# The problem asks for the expression itself. Here it is, wrapped in a small script.
+numbers = (1, 2, 3, 4, 5, 6)
+
+# The list comprehension expression
+squared_odds = [num**2 for num in numbers if num % 2 != 0]
+
+# Example Usage:
+print(f"Given numbers: {numbers}")
+print(f"Result of expression: {squared_odds}")`
+    },
+    {
         title: "13. Configurable Greeting Function",
         code: `def create_greeter(greeting: str = "Hello"):
     """
@@ -202,7 +214,11 @@ print(say_hola("Mundo"))`
     },
     {
         title: "14. Student Class with Grade Management",
-        code: `def __init__(self, name: str):
+        code: `class Student:
+    """
+    A class to represent a student with a name and a private list of grades.
+    """
+    def __init__(self, name: str):
         self.name = name
         self._grades = []  # Private attribute for encapsulation
 
@@ -227,7 +243,9 @@ print(f"{student1.name}'s average: {student1.get_average()}")`
     },
     {
         title: "15. File System Inheritance",
-        code: `def __init__(self, name: str):
+        code: `class FSItem:
+    """Base class for a file system item."""
+    def __init__(self, name: str):
         self.name = name
 
     def get_info(self) -> str:
@@ -285,7 +303,9 @@ process_logs(loggers_list, "System startup")`
     },
     {
         title: "17. Transaction Ledger Class",
-        code: `def __init__(self):
+        code: `class Ledger:
+    """A class to track a list of financial transactions."""
+    def __init__(self):
         self._transactions = []
 
     def add_transaction(self, amount: float):
@@ -310,7 +330,9 @@ print(f"Negative Transactions: {ledger.get_negative_transactions()}")`
     },
     {
         title: "18. Premium User with Super()",
-        code: `def __init__(self, username: str):
+        code: `class User:
+    """A simple user class."""
+    def __init__(self, username: str):
         self.username = username
 
     def get_status(self) -> str:
@@ -334,7 +356,14 @@ print(f"{premium_user.username}'s status: {premium_user.get_status()}")`
     },
     {
         title: "19. Dynamic Module-Based Calculator",
-        code: `def add(a, b):
+        code: `
+This problem requires two files.
+
+File 1: operations.py
+
+# File: operations.py
+
+def add(a, b):
     """Returns the sum of a and b."""
     return a + b
 
@@ -358,7 +387,11 @@ print(f"Subtraction result: {result2}")`
     },
     {
         title: "20. Vending Machine State Management",
-        code: `def __init__(self, inventory: dict):
+        code: `class VendingMachine:
+    """
+    Manages the state and logic of a vending machine.
+    """
+    def __init__(self, inventory: dict):
         self.inventory = inventory
 
     def purchase(self, item_name: str, money: float) -> str:
@@ -380,12 +413,12 @@ print(f"Subtraction result: {result2}")`
 
         # Check if money is sufficient
         if money < price:
-            return f'Insufficient funds. Price is \${price:.2f}.'
+            return f"Insufficient funds. Price is ${price:.2f}."
 
         # Process successful purchase
         self.inventory[item_name]['stock'] -= 1
         change = money - price
-        return f'Dispensing {item_name}. Your change is \${change:.2f}.'
+        return f"Dispensing {item_name}. Your change is ${change:.2f}."
 
 # Example Usage:
 inventory_data = {
