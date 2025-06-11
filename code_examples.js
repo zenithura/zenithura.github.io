@@ -430,6 +430,6 @@ vm = VendingMachine(inventory_data)
 print(vm.purchase('cola', 2.00))
 print(vm.purchase('chips', 0.75))
 print(vm.purchase('cola', 1.50))
-print(vm.purchase('cola', 1.50)) # This should be out of stock (expected behavior)`
+print(vm.purchase('cola', 1.50)) # This should be out of stock
     },
 ];
