@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mülki Müdafiə İmtahanı</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+            min-height: 500px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quiz-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .quiz-title {
+            color: #333;
+            font-size: 2.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .question-counter {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+            background: #f8f9fa;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: #f0f2ff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .option.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .option.correct {
+            border-color: #28a745;
+            background: #28a745;
+            color: white;
+        }
+
+        .option.incorrect {
+            border-color: #dc3545;
+            background: #dc3545;
+            color: white;
+        }
+
+        .feedback {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .next-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 20px auto;
+            display: block;
+            min-width: 150px;
+        }
+
+        .next-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .next-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .results-container {
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .results-title {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .score {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .score.excellent { color: #28a745; }
+        .score.good { color: #ffc107; }
+        .score.poor { color: #dc3545; }
+
+        .wrong-answers {
+            margin-top: 30px;
+            text-align: left;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .wrong-answer-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-left: 4px solid #dc3545;
+            background: white;
+            border-radius: 5px;
+        }
+
+        .restart-button {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .restart-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .quiz-content {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .quiz-container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .quiz-title {
+                font-size: 1.8em;
+            }
+            
+            .question-text {
+                font-size: 1.1em;
+            }
+            
+            .option {
+                padding: 12px 15px;
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1 class="quiz-title">Mülki Müdafiə İmtahanı</h1>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <div id="quizContent" class="quiz-content">
+            <div class="question-counter" id="questionCounter"></div>
+            <div class="question-text" id="questionText"></div>
+            <div class="options-container" id="optionsContainer"></div>
+            <div id="feedback" class="feedback" style="display: none;"></div>
+            <button id="nextButton" class="next-button" style="display: none;">Növbəti Sual</button>
+        </div>
+
+        <div id="resultsContainer" class="results-container" style="display: none;">
+            <h2 class="results-title">İmtahan Nəticəsi</h2>
+            <div id="scoreDisplay" class="score"></div>
+            <div id="wrongAnswers" class="wrong-answers"></div>
+            <button id="restartButton" class="restart-button">Yenidən Başla</button>
+        </div>
+    </div>
+
+    <script>
+         const questions = [
+             {
+                    question: "Azərbaycan BMMT hansı tarixdə üzv olub?",
+                    options: ["18.04.1992", "01.03.1993", "03.11.1993", "21.10.1994"],
+                    correct: 2
+                },
+                {
+                    question: "\"MM haqqında AR-nın Qanunu\" hansı tarixdə və neçə saylı fərman ilə tətbiq edilmişdir?",
+                    options: ["29.09.1992-193", "31.07.1992-73", "18.04.1998-700", "19.12.1997-75"],
+                    correct: 2
+                },
+                {
+                    question: "Mülki Müdafiə Təşkilatı (Cenevrə Regionu Asosassiyası) kim tərəfindən və neçənci ildə yaradılıb?",
+                    options: ["Corc Henri 1936", "Corc Sant Pol 1931", "Corc Buş 1988", "Corc Santa Klaus 1931"],
+                    correct: 1
+                },
+                {
+                    question: "Ərazi prinsipi nə deməkdir?",
+                    options: ["MM tədbirlərinin obyektlərdə təşkil edilməsi", "MM tədbirlərinin şəhərdə təşkil edilməsi", "MM tədbirlərinin respublikada təşkil edilməsi", "MM tədbirlərinin regionda təşkil edilməsi"],
+                    correct: 2
+                },
+                {
+                    question: "Kütləvilik və məcburilik prinsipi nə deməkdir?",
+                    options: ["Mülki müdafiə tədbirlərinin bölgələrin əhalisini əhatə etməsi və məcburi xarakter daşıması", "Mülki müdafiə tədbirlərinin şəhərlərin əhalisini əhatə etməsi və məcburi xarakter daşıması.", "Mülki müdafiə tədbirlərinin AR-in bütün əhalisini əhatə etməsi və məcburi xarakter daşıması", "Mülki müdafiə tədbirlərinin kənd və qəsəbələrin əhalisini əhatə etməsi və məcburi xarakter daşıması."],
+                    correct: 2
+                },
+                {
+                    question: "Fərqli və kompleks yanaşma prinsipi nə deməkdir?",
+                    options: ["AR-da mülki müdafiə tədbirlərinin ayrı-ayrı bölgələrin, şəhərlərin, istehsal və sosial təyinatlı obyektlərin hərbistrateji, iqtisadi və digər xüsusiyyətləri nəzərə alınmaqla planlaşdırılması və həyata keçirilməsi", "AR-da mülki müdafiə tədbirlərinin istehsal və sosial təyinatlı obyektlərin iqtisadi və digər xüsusiyyətləri nəzərə alınmaqla planlaşdırılması və həyata keçirilməsi", "AR-da mülki müdafiə tədbirlərinin ayrı-ayrı Nazirliklərin hərbistrateji xüsusiyyətləri nəzərə alınmaqla planlaşdırılması və həyata keçirilməsi", "AR-da mülki müdafiə tədbirlərinin rayonların sosial təyinatlı obyektlərin əhali sayı və digər xüsusiyyətləri nəzərə alınmaqla planlaşdırılması və həyata keçirilməsi"],
+                    correct: 0
+                },
+                {
+                    question: "Qarşılıqlı əlaqə prinsipi nə deməkdir?",
+                    options: ["MM-nin təmin edilməsində iştirak edən AR-nın Daxili İşlər Nazirliyi və mülki müdafiə qüvvələrinin sıx və uzlaşdırılmış fəaliyyət göstərməsi", "MM-nin təmin edilməsində iştirak edən AR-nın orqanlarının və xarici qüvvələrin sıx və uzlaşdırılmış fəaliyyət göstərməsi", "MM-nin təmin edilməsində iştirak edən AR-nın Müdafiə Nazirliyinin və mülki müdafiə qüvvələrinin sıx və uzlaşdırılmış fəaliyyət göstərməsi", "MM-nin təmin edilməsində iştirak edən AR-nın orqanlarının və mülki müdafiə qüvvələrinin sıx və uzlaşdırılmış fəaliyyət göstərməsi"],
+                    correct: 3
+                },
+                {
+                    question: "Daimi hazırlıq prinsipi nə deməkdir?",
+                    options: ["AR-nın icra hakimiyyəti orqanlarının fövqəladə hadisələr zamanı dərhal və səmərəli fəaliyyətə başlamağa hazır vəziyyətdə olması", "AR-nın mülki müdafiə sisteminin fövqəladə hadisələr zamanı dərhal və səmərəli fəaliyyətə başlamağa hazır vəziyyətdə olması", "AR-nın yanğından mühafizə xidmətinin fövqəladə hadisələr zamanı dərhal və səmərəli fəaliyyətə başlamağa hazır vəziyyətdə olması", "AR-nın müdafiə sənaye sisteminin fövqəladə hadisələr zamanı dərhal və səmərəli fəaliyyətə başlamağa hazır vəziyyətdə olması"],
+                    correct: 1
+                },
+                {
+                    question: "İdarəetmənin mahiyyəti nədir?",
+                    options: ["Fəlakət zonasında yerləşən əhaliyə daim rəhbərlik etmək onların fəalliyyətini qarşıda duran vəzifənin icrasına yönəltməkdən ibarətdir.", "MM-nin hərbiləşdirilmiş dəstələrinə rəhbərlik etmək vəzifənin icrasına yönəltməkdən ibarətdir.", "Hüquq mühafizə orqanlarına rəhbərlik etmək, vəzifənin icrasına yönəltməkdən ibarətdir.", "MM rəhbər və qərargahının özlərinə tabe olan qüvvələrə daim rəhbərlik etməsindən, onların fəalliyyətini qarşıda duran vəzifənin icrasına yönəltməkdən ibarətdir."],
+                    correct: 3
+                },
+                {
+                    question: "Bunlardan hansı idarəetmənin tələblərinə aid edilmir?",
+                    options: ["Çevik olmalı", "Dayanaqlı olmalı", "Sərt olmalı", "Qətiyyətli olmalı"],
+                    correct: 2
+                },
+                {
+                    question: "Yardımçı idarəetmə məntəqəsi nə vaxt yaradılır?",
+                    options: ["Əsas məntəqəyə ehtiyac olmayanda yaradılır", "Əhali köçürülən zaman onlara rəhbərlik etmək üçün nəqliyyat vasitələrində yaradılır", "Bütün tədbirlərə bir əsas məntəqədən rəhbərlik etmək mümkün olmayan hallarda yaradılır", "FH baş verən ərazidə rəhbər işçilərin sayı çox olduğu halda yaradılır"],
+                    correct: 2
+                },
+                {
+                    question: "Səyyar idarəetmə məntəqəsi harada yaradılır?",
+                    options: ["Yeni tikilmiş binada", "Nəqliyyat vasitələrində", "Zirzəmidə", "Metro stansiyada"],
+                    correct: 1
+                },
+                {
+                    question: "Fövqəladə hadisələri cəm halda götürsək onları hansı növlərə bölmək olar?",
+                    options: ["Müqayisəli-müqayisəsiz", "Təbii-texnogen", "Münaqişəli-münaqişəsiz", "Təbii-ekoloji"],
+                    correct: 2
+                },
+                {
+                    question: "Münaqişəli fh hansı aid edilir?",
+                    options: ["Zəlzələ-vulkan", "Sosial partlayışlar-milli münaqişə", "Terror-daşqın", "Yanğın-Kimyəvi maddələrin yayılması"],
+                    correct: 1
+                },
+                {
+                    question: "Münaqişəsiz fh hansı aid edilir?",
+                    options: ["Təbii, Tikinti qəzaları, Milli münaqişə", "Texnogen, Ekoloji, Terrorizm", "Təbii, Texnogen, Ekoloji", "Sosial partlayışlar, Bioloji, Təbii"],
+                    correct: 2
+                },
+                {
+                    question: "Bunlardan hansı texnogen qəzalara aid edilmir?",
+                    options: ["İri miqyaslı nəqliyyat qəzaları", "Dəniz sularının səviyyəsinin qalxması", "Binaların qəflətən uçması", "AES qəzaları zamanı radiasiyanın yayılması"],
+                    correct: 1
+                },
+                {
+                    question: "Bunlardan hansı ekoloji xarakterli fh hansı aid edilmir?",
+                    options: ["Atmosferin tərkibi və xassələrinin dəyişməsi", "Yerin vəziyyətinin dəyişməsi", "Suyun səviyyəsinin qalxması", "Biosferin vəziyyətinin dəyişməsi"],
+                    correct: 2
+                },
+                {
+                    question: "Geofiziki fh hansı aid edilir?",
+                    options: ["Subasma, daşqın", "Zəlzələ, vulkan", "Qasırğa, fırtına", "Epizootiya, epifitotiya"],
+                    correct: 1
+                },
+                {
+                    question: "Geoloji fh hansı aid edilir?",
+                    options: ["Zəlzələ, vulkan", "Leysan, quraqlıq", "Sel, sürüşmə", "Terror, ekstremizm"],
+                    correct: 2
+                },
+                {
+                    question: "Meteoroloji fh hansı aid edilir?",
+                    options: ["Leysan, quraqlıq", "Zəlzələ, vulkan", "Sel, sürüşmə", "Yanğın, partlayış"],
+                    correct: 0
+                },
+                {
+                    question: "Bioloji fh hansılar aid edilir?",
+                    options: ["Yanğın", "Epiloqiya", "Epilepsiya", "Epifitotiya"],
+                    correct: 3
+                },
+                {
+                    question: "Təsir dairəsinə görə yerli fövqəladə hadisəyə hansı aid edilir?",
+                    options: ["FH bir neçə sənayə və ya kənd təsərrüfatı rayonlarını, bütünlüklə şəhəri və onun ətrafını əhatə edir", "FH ancaq yaşayış məntəqəsinin təkcə bir şəhərin və ya k/t müəssisənin ərazisində özünü göstərir", "FH bir ölkənin ərazisində məhdudlaşmır qonşu dövlətlərində əraziisinə yayılır", "FH bir bina daxilində məhdudlaşmır həyətyani ərazisinədə yayılır"],
+                    correct: 1
+                },
+                {
+                    question: "Təsir dairəsinə görə regional fövqəladə hadisəyə hansı aid edilir?",
+                    options: ["FH bir neçə sənayə və ya kənd təsərrüfatı rayonlarını, bütünlüklə şəhəri və onun ətrafını əhatə edir", "FH ancaq yaşayış məntəqəsinin təkcə bir şəhərin və ya k/t müəssisənin ərazisində özünü göstərir", "FH bir ölkənin ərazisində məhdudlaşmır qonşu dövlətlərində əraziisinə yayılır", "FH bir bina daxilində məhdudlaşmır həyətyani ərazisinədə çıxır"],
+                    correct: 0
+                },
+                {
+                    question: "Bunlardan hansı MM təliminin prinsiplərinə aid edilmir?",
+                    options: ["Təlimin fəallığı", "Daim hazırlıq", "Elmilik", "Bilik və vərdişlərə möhkəm yiyələnmək"],
+                    correct: 1
+                },
+                {
+                    question: "Əhaliyyə MM-nin öyrədilməsi neçə yaşdan başlayır?",
+                    options: ["5", "7", "9", "12"],
+                    correct: 1
+                },
+                {
+                    question: "MM-in tədrisi neçə ay davam edir?",
+                    options: ["6", "8", "10", "12"],
+                    correct: 2
+                },
+                {
+                    question: "Nüvə silahının zədələyici amilləri hansılardır?",
+                    options: ["Zərbə dalğası, işıq süalanması, nüfuzedici radiasiya, bioloji zəhərlənmə, elektromaqnit impuls", "Zərbə dalğası, lazer süalanması, nüfuzedici radiasiya, radioaktiv zəhərlənmə, elektromaqnit impuls", "Zərbə dalğası, işıq süalanması, elektron radiasiya, radioaktiv zəhərlənmə, elektromaqnit impuls", "Zərbə dalğası, nüfuzedici radiasiya, radioaktiv zəhərlənmə, işıq süalanması, elektromaqnit impuls"],
+                    correct: 3
+                },
+                {
+                    question: "Nüvə partlayış gücünün neçə faizi zərbə dalğasına düşür?",
+                    options: ["4", "10", "35", "50"],
+                    correct: 3
+                },
+                {
+                    question: "Nüvə partlayış gücünün neçə faizi işıq şualanmasına düşür?",
+                    options: ["50", "35", "10", "1"],
+                    correct: 1
+                },
+                {
+                    question: "Nüvə partlayış gücünün neçə faizi radioaktiv zəhərlənməyə düşür?",
+                    options: ["1", "10", "35", "50"],
+                    correct: 1
+                },
+                {
+                    question: "Qatı duman, yağış və qar İşıq şualanmasının təsirini neçə dəfə zəiflədir?",
+                    options: ["10-20", "40-50", "60-70", "90-100"],
+                    correct: 0
+                },
+                {
+                    question: "Nüfuzedici radiasiya nədir?",
+                    options: ["Nüvə partlayışı anında ətrafa yayılan işıq şüaları selidir", "Nüvə partlayışı anında ətrafa yayılan elektron selidir", "Nüvə partlayışı anında ətrafa yayılan gözə görünməyən qamma süalar və neytron selidir", "Nüvə partlayışı anında ətrafa yayılan gözə görünməyən qamma süalar və proton selidir"],
+                    correct: 2
+                },
+                {
+                    question: "Üstü örtülmüş xəndək nüfuzedici radiasiyanın təsirini neçə dəfə zəiflədir?",
+                    options: ["10", "40", "100", "400"],
+                    correct: 1
+                },
+                {
+                    question: "Mühafizə üçün uyğunlaşdırılmış zirzəmi nüfuzedici radiasiyasının təsirini neçə dəfə zəiflədir?",
+                    options: ["20", "100", "400", "1000"],
+                    correct: 2
+                },
+                {
+                    question: "Elektromaqnit impuls nəyə təsir edir?",
+                    options: ["Yaşayış binalarına", "Qida anbarlarına", "İçməli su hövzələrinə", "Elektrik vasitələrə"],
+                    correct: 3
+                },
+                {
+                    question: "Yerin radioaktiv zəhərlənməsinin digər amıllərdən fərqləndirən xüsusiyyət hansıdır?",
+                    options: ["Partlayış gücünün dağıdıcı olması", "Kiçik qəlpələrə bölünməsi", "Çətin aşkar olunması", "Yandırıcı təsirli olması"],
+                    correct: 2
+                },
+                {
+                    question: "Hansı kimyəvi silahın əsas xüsusiyyətinə aid edilmir?",
+                    options: ["Ucuz başa gəlməsi", "Rahat əldə edilməsi", "Uzun müddət təsir göstərməsi", "Təsirinin ağır olması"],
+                    correct: 1
+                },
+                {
+                    question: "Kimyəvi zəhərlənmə ocağı neçə zonaya bölünür?",
+                    options: ["5", "4", "3", "2"],
+                    correct: 3
+                },
+                {
+                    question: "Təsirinə görə ZM hansı qruplara bölünür?",
+                    options: ["İonlaşdırıcı, taktiki", "Taktiki, toksikoloji", "Toksikoloji, yandırıcı", "Taktiki, izafi təzyiq"],
+                    correct: 1
+                },
+                {
+                    question: "Fosgen hansı toksikoloji təsirə aiddir?",
+                    options: ["Psixokimyəvi", "Qıcıqlandırıcı", "Boğucu", "Ümumzəhərləyici"],
+                    correct: 2
+                },
+                {
+                    question: "İpprit hansı toksikoloji təsirə aiddir?",
+                    options: ["Boğucu", "Dəridə yara çıxaran", "Göz yaşardıcı", "Psixokimyəvi"],
+                    correct: 1
+                },
+                {
+                    question: "Hansı üsul kimyəvi silahın tətbiq olunmasına aid deyil?",
+                    options: ["Top mərmilərində", "Təyyarə bombalarından", "Lazer silahından", "Buxar və aerozol (tüstü, duman) şəklində"],
+                    correct: 2
+                },
+            {
+                question: "Hansı bioloji silahın əsas xüsusiyyətlərinə aid edilmir?",
+                options: [
+                    "Bəzi xəstəliklər xəstə adamlardan sağlam adamlara asanlıqla keçir və tez yayılır",
+                    "Yoluxucu xəstəliklər üçün xəstəliyin gizli dövrü olmasıdır",
+                    "İstehsalının başqa kütləvi qırğın silahlarına nisbətən daha çətin və baha başa gəlməsi",
+                    "Bəzi mikrob və zəhərlərin (toksinlərin) aşkar olunması çətinlik törətdiyinə görə zədələnmə təhlükəsi daha böyük olur"
+                ],
+                correct: 2
+            },
+            {
+                question: "Bioloji (bakterioloji) ocağının yaranmasına hansı vasitələr səbəb ola bilər?",
+                options: [
+                    "Viruslar, sianid turşusu, radioaktiv toz",
+                    "Zəhərli qazlar, rikketsiyalar, pirogenlər",
+                    "Neytronlar, kimyəvi vasitələr",
+                    "Bakteriya, viruslar, göbələklər"
+                ],
+                correct: 3
+            },
+            {
+                question: "Karantin nədir?",
+                options: [
+                    "Epidemiya ocağında yolxucu xəstəliklərin qarşısını almaq məqsədilə həyata keçirilən təcridetmə - məhdudlaşdırma və müalicə-profilaktik tədbirlər sisteminə deyilir",
+                    "Xaricimühitdə infeksion xəstəlik törədənlərin məhv edilməsi üçün keçirilən xüsusi tədbirlər kompleksidir",
+                    "Xəstəlik baş verən ərazidir",
+                    "Xəstəliyə yoluxduğu şüphəli bilinən insan və ya heyvanları müəyyən bir ərazidə xəstəliyin yayılmaması üçün saxlanılmasıdır"
+                ],
+                correct: 3
+            },
+            {
+                question: "Observasiya nədir?",
+                options: [
+                    "İnfeksion xəstəlik törədicilərini yayan həşəratlar məişət həşəratları buğumayaqlılar həmçinin paltar və əmlaka ziyan vuran həşəratlara qarşı aparılan xüsusi tədbirlər kompleksidir",
+                    "Epidemiya ocağında yolxucu xəstəliklərin qarşısını almaq məqsədilə həyata keçirilən təcridetmə -- məhdudlaşdırma və müalicə--profilaktik tədbirlər sisteminə deyilir",
+                    "Xaricimühitdə infeksion xəstəlik törədənlərin məhv edilməsi üçün keçirilən xüsusi tədbirlər kompleksidir",
+                    "Yoluxucu xəstəliklər tapılan ərazi"
+                ],
+                correct: 1
+            },
+            {
+                question: "Dezinfeksiya nəyə deyilir?",
+                options: [
+                    "Xəstə heyvanların arasında yayılmış xəstəliklərin məhv edilməsidir",
+                    "Müxtəlif əşyaların səthindəki xəstəliktörədici mikrobların və toksinlərin məhv edilməsidir",
+                    "Zəhərləyici və bakterial zəhərlənmə ocaqlarının təsirinin məhv edilməsidir",
+                    "Gəmiricilərlə yayılan yolxucu xəstəliklərin məhv edilməsidir"
+                ],
+                correct: 1
+            },
+            {
+                question: "Dezinseksiya nədir?",
+                options: [
+                    "Xəstə heyvanların arasında yayılmış xəstəliklərin məhv edilməsidir",
+                    "Müxtəlif əşyaların səthindəki xəstəliktörədici mikrobların və toksinlərin məhv edilməsidir",
+                    "İnfeksion xəstəlik törədicilərini yayan həşəratlar məişət həşəratları buğumayaqlılar həmçinin paltar və əmlaka ziyan vuran həşəratlara qarşı aparılan xüsusi tədbirlər kompleksidir",
+                    "Epidemioloji təhlükə yaradan gəmiricilərlə mübarizəyə deyilir"
+                ],
+                correct: 2
+            },
+            {
+                question: "Deretizasiya nədir?",
+                options: [
+                    "Xəstə heyvanların arasında yayılmış xəstəliklərin məhv edilməsidir",
+                    "Müxtəlif əşyaların səthindəki xəstəliktörədici mikrobların və toksinlərin məhv edilməsidir",
+                    "İnfeksion xəstəlik törədicilərini yayan həşəratlar məişət həşəratları buğumayaqlılar həmçinin paltar və əmlaka ziyan vuran həşəratlara qarşı aparılan xüsusi tədbirlər kompleksidir",
+                    "Epidemioloji təhlükə yaradan gəmiricilərlə mübarizəyə deyilir"
+                ],
+                correct: 3
+            },
+            {
+                question: "Bakterioloji silahdan yaranmış epidemiya zamanı hansı mühafizə tədbiri tətbiq eddilir?",
+                options: [
+                    "Epizootiya-epifitotiya",
+                    "Deqazasiya-dezinfeksiya",
+                    "Karantin-observasiya",
+                    "Heç biri"
+                ],
+                correct: 2
+            },
+            {
+                question: "Hansı əhalinin mühafizəsinin əsas üsullarına aid edilmir?",
+                options: [
+                    "Təhlükəli rayonlardan əhalinin köçürülməsi",
+                    "Kimyəvi və radioaktiv təhlükəli obyektlərə nəzarəti gücləndirilməsi",
+                    "Əhalinin müxtəlif mühafizə qurğularında daldalandırılması",
+                    "Fərdi mühafizə vasitələrindən istifadə olunması"
+                ],
+                correct: 1
+            },
+            {
+                question: "Əhalinin mühafizəsi üzrə planlaşdırılan tədbirlərin həcmi hansı prinsiplə həyata keçirilir?",
+                options: [
+                    "Məqsədyönlü və fasiləli",
+                    "Məqsədyönlü və kifayyətli",
+                    "Məqsədyönlü və keyfiyyətli",
+                    "Məqsədyönlü və mənalı"
+                ],
+                correct: 1
+            },
+            {
+                question: "Mülki müdafiənin həyəcan siqnalları hansılardır?",
+                options: [
+                    "\"Daşqın həyəcanı\", \"Yanğın həyəcanı\", \"Köçürülmə həyəcanı\"",
+                    "\"Təxribat həyəcanı\", \"Sosial həyəcan\". \"Terror həyəcanı\"",
+                    "\"Hava həyəcanı\", \"Kimya həyəcanı\", \"Radiasiya həyəcanı\"",
+                    "\"Hava şəraiti həyəcanı\", \"Bioloji maddələr həyəcanı\", \"Radio həyəcanı\""
+                ],
+                correct: 2
+            },
+            {
+                question: "\"Kimya həyəcanı\" zamanı zəhərlənmə zonasını tərk edərkən adamlar hansı istiqamətə hərəkət etməlidirlər?",
+                options: [
+                    "Əks istiqamətə",
+                    "Düz istiqamətdə",
+                    "Küləyin səmtinə paralel",
+                    "Küləyin səmtinə perpendikulyar"
+                ],
+                correct: 3
+            },
+            {
+                question: "Əhalinin diqqətini cəlb etmək məqsədilə hansı siqnal verilir?",
+                options: [
+                    "Yanğın hazırlığı",
+                    "Hamının diqqətinə",
+                    "Meteoroloji həyəcan",
+                    "Diqqət edin"
+                ],
+                correct: 1
+            },
+            {
+                question: "\"Radiasiya təhlükəsi\" siqnalı neçə saat müddətində baş verəcəyi gözləndikdə verilir?",
+                options: [
+                    "1",
+                    "2",
+                    "3",
+                    "4"
+                ],
+                correct: 0
+            },
+            {
+                question: "\"Hava həyəcanı\" siqnalı nə zaman verilir?",
+                options: [
+                    "Güclü leysan yağışı yağanda",
+                    "Atəşfəşanlıq zamanı",
+                    "Havada maqnit dalğası aşkar ediləndə",
+                    "Düşmənin hava hücumu gözlənldikdə"
+                ],
+                correct: 3
+            },
+            {
+                question: "Sığınacağın daldalanmaq üçün nəzərdə tutulan otaqların ümumi sahəsi neçə kv. metrdən az olmamalıdır?",
+                options: [
+                    "25",
+                    "45",
+                    "75",
+                    "105"
+                ],
+                correct: 2
+            },
+            {
+                question: "Mühafizə qurğuları necə təsnif olunur?",
+                options: [
+                    "Mühafizə qabiliyyətinə, partlayış təhlükəsinə, oda davamlığına görə",
+                    "Təyinatına, mühafizə xassələrinə, yerləşməsinə görə",
+                    "Mühafizə xassələrinə, avadanlıqların növünə, relyefinə görə",
+                    "Təyinatına, muasirliyinə, yerləşməsinə görə"
+                ],
+                correct: 1
+            },
+            {
+                question: "Örtülü yarğan adamları işıq şüalanmasının təsirindən nə qədər qoruyur?",
+                options: [
+                    "Tamamilə",
+                    "Qismən",
+                    "10-20 dəfə",
+                    "Qorumur"
+                ],
+                correct: 0
+            },
+            {
+                question: "Həcminə görə sığınacaqlar neçə növə bölünür?",
+                options: [
+                    "2",
+                    "3(kiçik orta və böyük)",
+                    "4",
+                    "5"
+                ],
+                correct: 1
+            },
+            {
+                question: "Üstü örtülmüş sadə sığınacaqların tutumu neçə nəfərə nəzərdə tutulur?",
+                options: [
+                    "1-20",
+                    "10-50",
+                    "30-80",
+                    "50-100"
+                ],
+                correct: 1
+            },
+            {
+                question: "Tutumu neçə nəfərdən artıq olan daldanacaqlarda ventilyasiya otağı olmalıdır?",
+                options: [
+                    "100",
+                    "200",
+                    "300",
+                    "400"
+                ],
+                correct: 2
+            },
+            {
+                question: "Sığınacağın daldalanmaq üçün nəzərdə tutulan otaqların ayrı ayrılıqda sahəsi neçə kv metrdən az olmamalıdır?",
+                options: [
+                    "25",
+                    "45",
+                    "75",
+                    "105"
+                ],
+                correct: 0
+            },
+            {
+                question: "Kiçik ölçülü sığınacaqların tutumu neçə nəfərə nəzərdə tutulur?",
+                options: ["10-300", "150-600(kiçik)", "600-2000(orta)", "2000-çox(böyük)"],
+                correct: 1
+            },
+            {
+                question: "Fərdi mühafizə vasitələrinin hansı növləri var?",
+                options: [
+                    "Ümumqoşun mühafizə komplekti, radiasiya daldanacaqları, tibbi mühafizə vasitələri, sığınacaqlar",
+                    "Süzgəcli əleyhqazlaq, dozimetrik cihazlar, antidodlar, səngərlər",
+                    "Tənəffüs orqanlarının mühafizə vasitələri, dəri səthinin mühafizə vasitələri, tibbi mühafizə vasitələri",
+                    "Apteçka, tabel vasitələri, həcmli partlayış vasitəsi, yanğın söndürən balonlar"
+                ],
+                correct: 2
+            },
+            {
+                question: "Fərdi tibbi mühafizə vasitələrinə nələr aiddir?",
+                options: [
+                    "Apteçka, yanıqlara qarşı dərmanlar, optik vasitələr",
+                    "Radiasiyanı zəiflədən həb, təyziq ölçən, şoka qarşı iynə",
+                    "Ağrı kəsici dərman, xələk, təcili yardım avtomobili",
+                    "Fərdi apteçka, kimya əleyhinə fərdi paket, fərdi sarğı paketi"
+                ],
+                correct: 3
+            },
+            {
+                question: "Tənəffüs üvlərini mühafizə vasitələrinin növləri hansılardır?",
+                options: [
+                    "Əleyhqazlar, respirator, sadə vasitələr",
+                    "Əleyhqazlar, gözlük, mürəkkəb vasitələr",
+                    "Əleyhqazlar, dəbilqə, gözlük",
+                    "Əleyhqazlar, antidod, radioprotektor"
+                ],
+                correct: 0
+            },
+            {
+                question: "Antidodlar nə üçündür?",
+                options: [
+                    "Radioaktiv maddələrin təsirinin qarşısını alan və zəiflədən həblərdir.",
+                    "Zəhərli maddələrin təsirinin qarşısını alan və zəiflədən həblərdir.",
+                    "Dəri səthinə düşən bakteriyaları zərərsizləşdirən maddə.",
+                    "Orqanizmdə ağrılara qarşı olan həblərdir."
+                ],
+                correct: 1
+            },
+            {
+                question: "Əleyhqazın baş ölçüsü necə ölçülür?",
+                options: ["Dairəvi, düz", "Üfüqi, şaquli", "Açıq, qapalı", "Ətraflı, təqribi"],
+                correct: 1
+            },
+            {
+                question: "Uşaq üçün mühafizə kamerası (KZD) neçə yaşadək körpələri mühafizə edir?",
+                options: ["1,5", "2,6", "3,2", "5"],
+                correct: 0
+            },
+            {
+                question: "Radioprotektorlar nə üçündür?",
+                options: [
+                    "Radioaktiv maddələrin təsirinin qarşısın alan və zəiflədən həblərdir",
+                    "Zəhərli maddələrin təsirinin qarşısın alan və zəiflədən həblərdir(Antidotdur)",
+                    "Dəri səthinə düşən bakteryaları zərərsizləşdirən maddə",
+                    "Orqanizmdə ağrılara qarşı olan həblərdir"
+                ],
+                correct: 0
+            },
+            {
+                question: "Köçürülmə nədir?",
+                options: [
+                    "Mülki müdafiə dəstələrinin həyatı və fəaliyyəti üçün təhlükə yaranan rayonlardan mühafizə qurğularına aparılması və yerləşdirməsi sistemidir",
+                    "İnsanların təbii fəlakətlər zamanı FHN-nin binalarında yerləşdirməsi üzrə tədbirlər kompeksidir",
+                    "İnsanların həyatı və fəaliyyəti üçün kütləvi və adi qırğın vasitələrinin təsirindən mühafizə etmək məqsədilə sığınacaqlarda yerləşdirməsi üzrə tədbirlər kompeksidir",
+                    "İnsanların həyatı və fəaliyyəti üçün təhlükə yaranan rayonlardan əhalinin mütəşəkkil surətdə çıxarılıb təhlükəsiz rayonlarda yerləşdirilməsi üzrə tədbirlər kompleksidir"
+                ],
+                correct: 3
+            },
+            {
+                question: "Müharibə dövrü köçürülmə ilə qərarı kimlər qəbul edir?",
+                options: [
+                    "Rayon İH başçısı və ya Fövqəladə hallar naziri",
+                    "Prezident və ya Fövqəladə hallar naziri",
+                    "Prezident və ya Baş nazir",
+                    "Prezident və ya Müdafiə naziri"
+                ],
+                correct: 2
+            },
+            {
+                question: "Sülh dövründə köçürülmə ilə qərarı kim verir?",
+                options: ["Prezident", "Baş nazir", "İcra başçısı", "Daxili işlər naziri"],
+                correct: 2
+            },
+            {
+                question: "Yaranmış vəziyyətdən asılı olaraq əhalinin köçürülməsinin hansı növləri vardır?",
+                options: ["Ümumi-qismən", "Piyada-nəqliyyatla", "Piyada-kombinasiyalı", "Lokal-yerli"],
+                correct: 0
+            },
+            {
+                question: "Qismən köçürmə zamanı kimlər köçürülür?",
+                options: [
+                    "Əmək qabiliyyəti olmayan lakin istehsalatda çalışan əhali",
+                    "Əmək qabiliyyəti olan istehsalat və xidmət sahəsində işləyən əhali və onların ailə üzvləri",
+                    "Əmək qabiliyyəti olmayan, habelə istehsalat və xidmət sahələrində işləməyən əhali",
+                    "Tələbə və müəllimlər"
+                ],
+                correct: 2
+            },
+            {
+                question: "Əhalinin köçürülməsinin əsas üsulu hansıdır?",
+                options: ["Piyada", "Nəqliyyatla", "Kombinasiyalı", "Hava şarıyla"],
+                correct: 2
+            },
+            {
+                question: "Fövqəladə hal zonasından çıxarılan əhalinin sayından asılı olaraq təxliyənin növləri hansılardır?",
+                options: [
+                    "Lokal, yerli, milli",
+                    "Obyekt, regional, qlobal",
+                    "Lokal, yerli, regional",
+                    "Hər kəs, heç kəs"
+                ],
+                correct: 2
+            },
+            {
+                question: "Yerli təxliyyə hansıdır?",
+                options: [
+                    "FH mənbəyinin zədə faktorlarının mümkün təsir zonası ayrı-ayrı şəhər mikrorayonları və ya kənd yaşayış məntəqələri hüdudları ilə məhdudlaşdıqda və təxliyə edilən əhalinin sayı bir neçə min insanla ölçüldükdə keçirilir",
+                    "Zədə faktorları xeyli ərazilərə təsir etdikdə, əhali sıxlığı yüksək və tərkibində iri şəhərlər olan bir və ya bir neçə regionu əhatə etdikdə həyata keçirilir",
+                    "Orta saylı şəhərlər, iri şəhərlərin ayrı-ayrı rayonları və kənd rayonları fövqəladə hal zonası təsiri altına düşdükdə keçirilir",
+                    "Dövlətin bütün ərazisində həyata keçirilir"
+                ],
+                correct: 2
+            },
+            {
+                question: "Regional təxliyyə hansıdır?",
+                options: [
+                    "FH mənbəyinin zədə faktorlarının mümkün təsir zonası ayrı-ayrı şəhər mikrorayonları və ya kənd yaşayış məntəqələri hüdudları ilə məhdudlaşdıqda və təxliyə edilən əhalinin sayı bir neçə min insanla ölçüldükdə keçirilir.",
+                    "Zədə faktorları xeyli ərazilərə təsir etdikdə, əhali sıxlığı yüksək və tərkibində iri şəhərlər olan bir və ya bir neçə regionu əhatə etdikdə həyata keçirilir.",
+                    "Orta saylı şəhərlər, iri şəhərlərin ayrı-ayrı rayonları və kənd rayonları fövqəladə hal zonası təsiri altına düşdükdə keçirilir.",
+                    "Dövlətin bütün ərazisində həyata keçirilir."
+                ],
+                correct: 1
+            },
+            {
+                question: "Nəqliyyatla köçürülmə zamanı götürüləcək yükün ümumi kütləsi neçə kq-dan çox olmamalıdır?",
+                options: ["10", "20", "50", "100"],
+                correct: 2
+            },
+            {
+                question: "Köçürülmə zamanı piyada dəstələri saatda neçə km sürəti ilə hərəkət etməlidir?",
+                options: ["1-2", "2-3", "4-5", "6-7"],
+                correct: 2
+            },
+            {
+                question: "Bunlardan hansı yerinə yetirdikləri vəzifələrə görə MM dəstələrinin növlərinə aid deyil?",
+                options: [
+                    "Ümumi məqsədli dəstələr",
+                    "Xidmət (xüsusi təyinatlı) dəstələri",
+                    "İstəyə bağlı dəstələr",
+                    "İxtisaslaşdırılmış dəstələr"
+                ],
+                correct: 2
+            },
+            {
+                question: "Mülki müdafiə qüvvələrinin əsasını hansı dəstələr təşkil edir?",
+                options: [
+                    "Hərbiləşdirilmiş MM dəstələri",
+                    "Hərbiləşdirilməmiş MM dəstələri",
+                    "Xüsusi təyinatlı MM qoşunları",
+                    "MM-in idarəetmə orqanları"
+                ],
+                correct: 1
+            },
+            {
+                question: "Qarşıya çıxan tapşırığın xarakterinə görə kəşfiyyat hansı növlərə bölünür?",
+                options: ["Əsas-yardımçı", "Ümumi-qismən", "Daxili-xarici", "Ümumi-xüsusi"],
+                correct: 3
+            },
+            {
+                question: "Hansı növ xüsusi kəşfiyyata aid edilmir?",
+                options: ["Radiasiya", "Yanğın", "Tibbi", "İqtisadi"],
+                correct: 3
+            },
+            {
+                question: "Hansı kəşfiyyatın növünə aid deyil?",
+                options: ["Yerüstü", "Havadan", "Yeraltı", "Dənizdən"],
+                correct: 2
+            },
+            {
+                question: "Ən dəqiq, daha dolğun kəşfiyyat növü hansı sayılır?",
+                options: ["Havadan", "Yerdən", "Sudan", "Bazardan"],
+                correct: 1
+            },
+            {
+                question: "Qəza-xilasetmə işləri dedikdə nə başa düşülür?",
+                options: [
+                    "İşlərin hərtərəfli təmin olunması, FH zərərçəkmiş əhaliyə tibbi və başqa yardımların edilməsi, insan-ların sağlamlığı və həyatını, əmək qabiliyyətini təmin edən minimal şəraitin yaradılması başa düşülür",
+                    "FH baş vermiş zonada insanların, maddi və mədəni sərvətlərin xilas edilməsi, təbii mühitin mühafizəsi, FH lokallaşdırılması, FH zədələyici amillərinin təsirinin qarşısının alınması və ya minimal səviyyəyə qədər azaldılması başa düşülür",
+                    "Düşmən basqını nəticəsində yaranan zədələnmə (zəhərlənmə) ocaqlarında, eləcə də təbii fəlakət və güclü qəza rayonlarında adamları xilas etmək, onlara yardım gösətrmək və qəzaların nəticələrini məhdudlaşdırmaq başa düşülür",
+                    "FH zonasında partlamamış sursatların tapılması və zərərsizləşdirilməsi, müəsissələrin iş növbələrindəki işçiləri ünvanlarına çatdırılması"
+                ],
+                correct: 1
+            },
+            {
+                question: "Digər təxirə salınmaz tədbirlər dedikdə nə başa düşülür?",
+                options: [
+                    "FH baş vermiş zonada insanların, maddi və mədəni sərvətlərin xilas edilməsi, təbii mühitin mühafizəsi, FH lokallaşdırılması, FH zədələyici amillərinin təsirinin qarşısının alınması və ya minimal səviyyəyə qədər azaldılması başa düşülür",
+                    "Düşmən basqını nəticəsində yaranan zədələnmə (zəhərlənmə) ocaqlarında, eləcə də təbii fəlakət və güclü qəza rayonlarında adamları xilas etmək, onlara yardım gösətrmək və qəzaların nəticələrini məhdudlaşdırmaq başa düşülür",
+                    "İşlərin hərtərəfli təmin olunması, FH zərərçəkmiş əhaliyə tibbi və başqa yardımların edilməsi, insan-ların sağlamlığı və həyatını, əmək qabiliyyətini təmin edən minimal şəraitin yaradılması başa düşülür",
+                    "Qəza bölgəsində partlamamış sursatların tapılması və zərərsizləşdirilməsi"
+                ],
+                correct: 2
+            },
+            {
+                question: "Dezaktivasiya nədir?",
+                options: [
+                    "Müxtəlif əşyaların səthindəki xəstəliktörədici mikrobların, virusların və toksinlərin kənar etməklə yoluxmanın təhlükəsiz dərəcəyədək azaldılmasıdır",
+                    "Zəhərlənmiş sahələrin, texnikanın, əşyaların, paltarların və ayyaqqabıların səthindən radioaktiv maddələri kənar etməklə zəhərlənmənin təhlükəsiz dərəcəyədək azaldılmasıdır",
+                    "Kimyəvi və bakterial zəhərlənmə ocaqlarının təsirinin məhv edilməsidir",
+                    "Zəhərləyici maddələrin neytrallaşdırılması və ya zəhərli səthlərdən kənar edilməsidir"
+                ],
+                correct: 1
+            },
+            {
+                question: "Dezaktivasiyanı neçə üsulla aparmaq olar?",
+                options: ["1", "2", "3", "4"],
+                correct: 1
+            },
+            {
+                question: "Digər təxirəsalınmaz işlərə nə aiddir?",
+                options: [
+                    "Əhalinin təhlükəli zonadan çıxarılması",
+                    "Hərəkət marşrutu yollarının və iş yerlərinin kəşfiyyatı",
+                    "Süzücü-ventilyasiya sistemi zədələnmiş sığınacaqlara hava verilməsi",
+                    "Qaz, elektrik, texnoloji şəbəkələrdə, su, kanalizasiya xətlərində qəzaların məhdudlaşdırılması"
+                ],
+                correct: 3
+            },
+            {
+                question: "FH nəticələrinin aradan qaldırılması, fh zonasındakı vətəndaşlar və təşkilatlar üçün necə sayılır?",
+                options: ["Adi", "Könüllü", "Məcburi", "Sərbəst"],
+                correct: 2
+            },
+            {
+                question: "Dezinfeksiya əsasən neçə üsulla aparılır?",
+                options: ["1", "2", "3(mexaniki fiziki kimyəvi)", "4"],
+                correct: 2
+            },
+            {
+                question: "İlk tibbi yardımın məqsədi hansıdır?",
+                options: [
+                    "Həyatı təhlükəni ortadan qaldırmaq",
+                    "Kimyəvi zəhərlənmənin qarşısını almaq",
+                    "Mühafizə üsulları haqda maarifləndirmək",
+                    "Tibbi biliklərə yiyələnmək"
+                ],
+                correct: 0
+            },
+            {
+                question: "İlk yardımçının xüsusiyətləri nədir?",
+                options: [
+                    "Mütləq şəkildə tibbi təhsili olmalıdır",
+                    "Yardım göstərmənin kursun keçməli və sənəd almalıdır",
+                    "Özündən və məlumatlarından əmin olmalıdır",
+                    "Tez bir zamanda hadisə yerindən qaçmalıdır"
+                ],
+                correct: 2
+            },
+            {
+                question: "Qanaxmanın neçə növü vardır?",
+                options: ["3(xarici\\iç\\təbii dəliklərdən olan qanaxma)", "4", "5", "6"],
+                correct: 0
+            },
+            {
+                question: "Arteliyar qanaxma hansıdır?",
+                options: [
+                    "Davamlı axar, tünd qırmızı rənglidir.",
+                    "Ürək atışına uyğun şəkildə kəsik və fışqıraraq axar, açıq qırmızı rənglidir.",
+                    "Qanama yavaş və sızıntı şəklindədir. Kiçik qabarcıqlar görünə bilər",
+                    "İstədiyi vaxt axar istədiyi vaxt dayanar"
+                ],
+                correct: 1
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let wrongAnswers = [];
+        let selectedOption = null;
+        let answered = false;
+        let shuffledQuestions = []; // Array to hold shuffled questions
+
+        // Function to shuffle array using Fisher-Yates algorithm
+        function shuffleArray(array) {
+            const shuffled = [...array]; // Create a copy of the original array
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Initialize shuffled questions
+        function initializeQuiz() {
+            shuffledQuestions = shuffleArray(questions);
+        }
+
+        function displayQuestion() {
+            const question = shuffledQuestions[currentQuestion];
+            
+            document.getElementById('questionCounter').textContent = `Sual ${currentQuestion + 1} / ${shuffledQuestions.length}`;
+            document.getElementById('questionText').textContent = question.question;
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = `${String.fromCharCode(97 + index)}) ${option}`;
+                optionElement.onclick = () => selectOption(index);
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            // Update progress bar
+            const progress = ((currentQuestion + 1) / shuffledQuestions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            // Reset states
+            selectedOption = null;
+            answered = false;
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('nextButton').style.display = 'none';
+        }
+
+        function selectOption(index) {
+            if (answered) return;
+            
+            selectedOption = index;
+            const options = document.querySelectorAll('.option');
+            
+            // Remove previous selections
+            options.forEach(opt => opt.classList.remove('selected'));
+            
+            // Mark selected option
+            options[index].classList.add('selected');
+            
+            // Check answer immediately
+            checkAnswer();
+        }
+
+        function checkAnswer() {
+            if (selectedOption === null || answered) return;
+            
+            answered = true;
+            const question = shuffledQuestions[currentQuestion];
+            const options = document.querySelectorAll('.option');
+            const feedback = document.getElementById('feedback');
+            
+            // Show correct answer
+            options[question.correct].classList.add('correct');
+            
+            if (selectedOption === question.correct) {
+                score++;
+                feedback.textContent = '✓ Doğru cavab!';
+                feedback.className = 'feedback correct';
+            } else {
+                options[selectedOption].classList.add('incorrect');
+                feedback.textContent = `✗ Səhv! Doğru cavab: ${String.fromCharCode(97 + question.correct)}) ${question.options[question.correct]}`;
+                feedback.className = 'feedback incorrect';
+                wrongAnswers.push({
+                    questionNumber: currentQuestion + 1,
+                    question: question.question,
+                    yourAnswer: question.options[selectedOption],
+                    correctAnswer: question.options[question.correct]
+                });
+            }
+            
+            feedback.style.display = 'block';
+            document.getElementById('nextButton').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            
+            if (currentQuestion < shuffledQuestions.length) {
+                displayQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quizContent').style.display = 'none';
+            document.getElementById('resultsContainer').style.display = 'block';
+            
+            const percentage = Math.round((score / shuffledQuestions.length) * 100);
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            
+            scoreDisplay.textContent = `${score}/${shuffledQuestions.length} (${percentage}%)`;
+            
+            if (percentage >= 80) {
+                scoreDisplay.className = 'score excellent';
+            } else if (percentage >= 60) {
+                scoreDisplay.className = 'score good';
+            } else {
+                scoreDisplay.className = 'score poor';
+            }
+            
+            // Show wrong answers
+            const wrongAnswersContainer = document.getElementById('wrongAnswers');
+            if (wrongAnswers.length > 0) {
+                wrongAnswersContainer.innerHTML = '<h3>Səhv cavablar:</h3>';
+                wrongAnswers.forEach(wrong => {
+                    const wrongItem = document.createElement('div');
+                    wrongItem.className = 'wrong-answer-item';
+                    wrongItem.innerHTML = `
+                        <strong>Sual ${wrong.questionNumber}:</strong> ${wrong.question}<br>
+                        <span style="color: #dc3545;">Sizin cavabınız: ${wrong.yourAnswer}</span><br>
+                        <span style="color: #28a745;">Doğru cavab: ${wrong.correctAnswer}</span>
+                    `;
+                    wrongAnswersContainer.appendChild(wrongItem);
+                });
+            } else {
+                wrongAnswersContainer.innerHTML = '<h3 style="color: #28a745;">Əla! Bütün suallara doğru cavab verdiniz!</h3>';
+            }
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            wrongAnswers = [];
+            selectedOption = null;
+            answered = false;
+            
+            // Shuffle questions again for a new random order
+            shuffledQuestions = shuffleArray(questions);
+            
+            document.getElementById('quizContent').style.display = 'block';
+            document.getElementById('resultsContainer').style.display = 'none';
+            
+            displayQuestion();
+        }
+
+        // Event listeners
+        document.getElementById('nextButton').onclick = nextQuestion;
+        document.getElementById('restartButton').onclick = restartQuiz;
+
+        // Keyboard support
+        document.addEventListener('keydown', function(e) {
+            if (answered && e.key === 'Enter') {
+                if (currentQuestion < shuffledQuestions.length - 1) {
+                    nextQuestion();
+                } else if (currentQuestion === shuffledQuestions.length - 1) {
+                    showResults();
+                }
+            } else if (!answered && e.key >= '1' && e.key <= '4') {
+                const optionIndex = parseInt(e.key) - 1;
+                if (optionIndex < shuffledQuestions[currentQuestion].options.length) {
+                    selectOption(optionIndex);
+                }
+            }
+        });
+
+        // Initialize and start the quiz
+        initializeQuiz();
+        displayQuestion();
+    </script>
+</body>
+</html>
