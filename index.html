@@ -1,601 +1,461 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="az">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python Code Examples</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Mülki Müdafiə İmtahanı</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+            min-height: 500px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quiz-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .quiz-title {
+            color: #333;
+            font-size: 2.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .question-counter {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+            background: #f8f9fa;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: #f0f2ff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .option.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .option.correct {
+            border-color: #28a745;
+            background: #28a745;
+            color: white;
+        }
+
+        .option.incorrect {
+            border-color: #dc3545;
+            background: #dc3545;
+            color: white;
+        }
+
+        .feedback {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .next-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 20px auto;
+            display: block;
+            min-width: 150px;
+        }
+
+        .next-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .next-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .results-container {
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .results-title {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .score {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .score.excellent { color: #28a745; }
+        .score.good { color: #ffc107; }
+        .score.poor { color: #dc3545; }
+
+        .wrong-answers {
+            margin-top: 30px;
+            text-align: left;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .wrong-answer-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-left: 4px solid #dc3545;
+            background: white;
+            border-radius: 5px;
+        }
+
+        .restart-button {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .restart-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .quiz-content {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .quiz-container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .quiz-title {
+                font-size: 1.8em;
+            }
+            
+            .question-text {
+                font-size: 1.1em;
+            }
+            
+            .option {
+                padding: 12px 15px;
+                font-size: 1em;
+            }
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Python Code Examples</h1>
-        <div class="header-buttons">
-            <button id="copyAllBtn" class="action-button">
-                <i class="fas fa-copy"></i> Copy All Code
-            </button>
-            <button id="downloadAllBtn" class="action-button">
-                <i class="fas fa-download"></i> Download All
-            </button>
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1 class="quiz-title">Mülki Müdafiə İmtahanı</h1>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
         </div>
-    </header>
 
-    <main>
-        <div class="code-container">
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-title">1. Grade Classifier</div>
-                    <div class="code-actions">
-                        <button onclick="copyCode(this)" title="Copy Code"><i class="fas fa-copy"></i></button>
-                        <button onclick="downloadCode(this, 'grade-classifier.py')" title="Download Code"><i class="fas fa-download"></i></button>
-                    </div>
-                </div>
-                <pre><code>def assign_grade(score: int) -> str:
-    """
-    Takes a numerical score and returns the corresponding letter grade.
-    """
-    if score >= 90:
-        return "A"
-    elif score >= 80:
-        return "B"
-    elif score >= 70:
-        return "C"
-    elif score >= 60:
-        return "D"
-    else:
-        return "F"
-
-# Example Usage:
-print(f"95 -> {assign_grade(95)}")
-print(f"82 -> {assign_grade(82)}")
-print(f"59 -> {assign_grade(59)}")</code></pre>
-            </div>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-title">2. Character Repeater</div>
-                    <div class="code-actions">
-                        <button onclick="copyCode(this)" title="Copy Code"><i class="fas fa-copy"></i></button>
-                        <button onclick="downloadCode(this, 'character-repeater.py')" title="Download Code"><i class="fas fa-download"></i></button>
-                    </div>
-                </div>
-                <pre><code>def repeat_chars(text: str, n: int) -> str:
-    """
-    Returns a new string where every character from the original string 
-    is repeated n times.
-    """
-    new_string = ""
-    for char in text:
-        new_string += char * n
-    return new_string
-
-# Example Usage:
-print(f"'abc', 3 -> {repeat_chars('abc', 3)}")
-print(f"'Hi', 2 -> {repeat_chars('Hi', 2)}")</code></pre>
-            </div>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-title">3. Find First Occurrence</div>
-                    <div class="code-actions">
-                        <button onclick="copyCode(this)" title="Copy Code"><i class="fas fa-copy"></i></button>
-                        <button onclick="downloadCode(this, 'find-first-occurrence.py')" title="Download Code"><i class="fas fa-download"></i></button>
-                    </div>
-                </div>
-                <pre><code>def find_first(items: list, target) -> int:
-    """
-    Returns the index of the first occurrence of target in the list items.
-    If the target is not in the list, returns -1.
-    """
-    for i in range(len(items)):
-        if items[i] == target:
-            return i
-    return -1
-
-# Example Usage:
-print(f"['a', 'b', 'c', 'b'], 'b' -> {find_first(['a', 'b', 'c', 'b'], 'b')}")
-print(f"[1, 2, 3], 4 -> {find_first([1, 2, 3], 4)}")</code></pre>
-            </div>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-title">4. String Property Checker</div>
-                    <div class="code-actions">
-                        <button onclick="copyCode(this)" title="Copy Code"><i class="fas fa-copy"></i></button>
-                        <button onclick="downloadCode(this, 'string-property-checker.py')" title="Download Code"><i class="fas fa-download"></i></button>
-                    </div>
-                </div>
-                <pre><code>def validate_string(text: str) -> bool:
-    """
-    Returns True only if the input string has a length of 8 or more characters 
-    and contains the letter 'a' (case-insensitive).
-    """
-    has_min_length = len(text) >= 8
-    has_a = 'a' in text.lower()
-    return has_min_length and has_a
-
-# Example Usage:
-print(f"'fantastic' -> {validate_string('fantastic')}")
-print(f"'awesome' -> {validate_string('awesome')}")
-print(f"'wonderful' -> {validate_string('wonderful')}")</code></pre>
-            </div>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-title">5. Filter List by Length</div>
-                    <div class="code-actions">
-                        <button onclick="copyCode(this)" title="Copy Code"><i class="fas fa-copy"></i></button>
-                        <button onclick="downloadCode(this, 'filter-list-by-length.py')" title="Download Code"><i class="fas fa-download"></i></button>
-                    </div>
-                </div>
-                <pre><code>def filter_by_length(words: list[str], min_length: int) -> list[str]:
-    """
-    Takes a list of strings and a minimum length, and returns a new list 
-    containing only the strings that meet the minimum length requirement.
-    """
-    result = []
-    for word in words:
-        if len(word) >= min_length:
-            result.append(word)
-    return result
-
-# Example Usage:
-print(filter_by_length(["apple", "cat", "banana", "dog", "elephant"], 5))</code></pre>
-            </div>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-title">6. Sum of String Digits</div>
-                    <div class="code-actions">
-                        <button onclick="copyCode(this)" title="Copy Code"><i class="fas fa-copy"></i></button>
-                        <button onclick="downloadCode(this, 'sum-of-string-digits.py')" title="Download Code"><i class="fas fa-download"></i></button>
-                    </div>
-                </div>
-                <pre><code>def sum_digits(number_str: str) -> int:
-    """
-    Takes a string of digits and returns the sum of all the digits as an integer.
-    """
-    total = 0
-    for digit_char in number_str:
-        total += int(digit_char)
-    return total
-
-# Example Usage:
-print(f"'1928' -> {sum_digits('1928')}")</code></pre>
-            </div>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-title">7. Extract Seniors from Tuple Data</div>
-                    <div class="code-actions">
-                        <button onclick="copyCode(this)" title="Copy Code"><i class="fas fa-copy"></i></button>
-                        <button onclick="downloadCode(this, 'extract-seniors.py')" title="Download Code"><i class="fas fa-download"></i></button>
-                    </div>
-                </div>
-                <pre><code>def get_seniors(people: list[tuple]) -> list[str]:
-    """
-    Returns a sorted list of names of people who are 65 years of age or older.
-    """
-    senior_names = []
-    for name, age, city in people:
-        if age >= 65:
-            senior_names.append(name)
-    return sorted(senior_names)
-
-# Example Usage:
-people_data = [("Alice", 30, "NY"), ("Bob", 70, "CA"), ("Charlie", 65, "TX"), ("David", 25, "FL")]
-print(get_seniors(people_data))</code></pre>
-            </div>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-title">8. Invert Dictionary</div>
-                    <div class="code-actions">
-                        <button onclick="copyCode(this)" title="Copy Code"><i class="fas fa-copy"></i></button>
-                        <button onclick="downloadCode(this, 'invert-dictionary.py')" title="Download Code"><i class="fas fa-download"></i></button>
-                    </div>
-                </div>
-                <pre><code>def invert_mapping(mapping: dict) -> dict:
-    """
-    Takes a dictionary and returns a new dictionary where the keys and 
-    values have been swapped.
-    """
-    inverted_dict = {}
-    for key, value in mapping.items():
-        inverted_dict[value] = key
-    return inverted_dict
-
-# Example Usage:
-print(invert_mapping({'a': 'z', 'b': 'y', 'c': 'x'}))</code></pre>
-            </div>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-title">9. Sort Rectangles by Area</div>
-                    <div class="code-actions">
-                        <button onclick="copyCode(this)" title="Copy Code"><i class="fas fa-copy"></i></button>
-                        <button onclick="downloadCode(this, 'sort-rectangles.py')" title="Download Code"><i class="fas fa-download"></i></button>
-                    </div>
-                </div>
-                <pre><code>def sort_rectangles_by_area(rectangles: list[dict]) -> list[dict]:
-    """
-    Sorts a list of rectangle dictionaries in ascending order based on their area.
-    """
-    return sorted(rectangles, key=lambda rect: rect['length'] * rect['width'])
-
-# Example Usage:
-rects = [{'length': 5, 'width': 5}, {'length': 3, 'width': 10}, {'length': 2, 'width': 5}]
-print(sort_rectangles_by_area(rects))</code></pre>
-            </div>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-title">10. Find Missing Sequence Numbers</div>
-                    <div class="code-actions">
-                        <button onclick="copyCode(this)" title="Copy Code"><i class="fas fa-copy"></i></button>
-                        <button onclick="downloadCode(this, 'find-missing-numbers.py')" title="Download Code"><i class="fas fa-download"></i></button>
-                    </div>
-                </div>
-                <pre><code>def find_missing(nums: list[int], n: int) -> set:
-    """
-    Returns a set of all the integers missing from a complete sequence from 1 to N.
-    """
-    complete_sequence = set(range(1, n + 1))
-    given_numbers = set(nums)
-    return complete_sequence.difference(given_numbers)
-
-# Example Usage:
-print(find_missing([1, 2, 5, 6], 8))</code></pre>
-            </div>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-title">11. Count Words Excluding Stopwords</div>
-                    <div class="code-actions">
-                        <button onclick="copyCode(this)" title="Copy Code"><i class="fas fa-copy"></i></button>
-                        <button onclick="downloadCode(this, 'count-words.py')" title="Download Code"><i class="fas fa-download"></i></button>
-                    </div>
-                </div>
-                <pre><code>def count_frequent_words(text: str, stopwords: set[str]) -> dict:
-    """
-    Counts the frequency of words in a text, excluding a given set of stopwords.
-    The comparison is case-insensitive, and the resulting dictionary keys are lowercase.
-    """
-    word_counts = {}
-    words = text.split()
-    
-    for word in words:
-        # The example output shows keys that are not fully cleaned (e.g., 'sentence,')
-        # To match the example, we lowercase the word for the key.
-        # The check against stopwords is also case-insensitive.
-        key = word.lower()
-        if key not in stopwords:
-            word_counts[key] = word_counts.get(key, 0) + 1
-            
-    return word_counts
-
-# Example Usage:
-text_block = "This is a sample sentence, this is not a test."
-stopword_set = {"is", "a", "not"}
-print(count_frequent_words(text_block, stopword_set))</code></pre>
-            </div>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-title">12. Squares of Odd Numbers with List Comprehension</div>
-                    <div class="code-actions">
-                        <button onclick="copyCode(this)" title="Copy Code"><i class="fas fa-copy"></i></button>
-                        <button onclick="downloadCode(this, 'squares-odd-numbers.py')" title="Download Code"><i class="fas fa-download"></i></button>
-                    </div>
-                </div>
-                <pre><code># The problem asks for the expression itself. Here it is, wrapped in a small script.
-numbers = (1, 2, 3, 4, 5, 6)
-
-# The list comprehension expression
-squared_odds = [num**2 for num in numbers if num % 2 != 0]
-
-# Example Usage:
-print(f"Given numbers: {numbers}")
-print(f"Result of expression: {squared_odds}")</code></pre>
-            </div>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-title">13. Configurable Greeting Function</div>
-                    <div class="code-actions">
-                        <button onclick="copyCode(this)" title="Copy Code"><i class="fas fa-copy"></i></button>
-                        <button onclick="downloadCode(this, 'configurable-greeting.py')" title="Download Code"><i class="fas fa-download"></i></button>
-                    </div>
-                </div>
-                <pre><code>def create_greeter(greeting: str = "Hello"):
-    """
-    A factory function that returns a new greeting function.
-    The returned function uses the greeting provided to the factory.
-    """
-    def greeter(name: str) -> str:
-        return f"{greeting}, {name}!"
-    
-    return greeter
-
-# Example Usage:
-say_hello = create_greeter()
-say_hola = create_greeter("Hola")
-
-print(say_hello("World"))
-print(say_hola("Mundo"))</code></pre>
-            </div>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-title">14. Student Class with Grade Management</div>
-                    <div class="code-actions">
-                        <button onclick="copyCode(this)" title="Copy Code"><i class="fas fa-copy"></i></button>
-                        <button onclick="downloadCode(this, 'student-class.py')" title="Download Code"><i class="fas fa-download"></i></button>
-                    </div>
-                </div>
-                <pre><code>class Student:
-    """
-    A class to represent a student with a name and a private list of grades.
-    """
-    def __init__(self, name: str):
-        self.name = name
-        self._grades = []  # Private attribute for encapsulation
-
-    def add_grade(self, grade: int):
-        """Adds a grade (0-100) to the student's grade list."""
-        if 0 <= grade <= 100:
-            self._grades.append(grade)
-        else:
-            print("Invalid grade. Please enter a value between 0 and 100.")
-
-    def get_average(self) -> float:
-        """Calculates and returns the average of the student's grades."""
-        if not self._grades:
-            return 0.0
-        return sum(self._grades) / len(self._grades)
-
-# Example Usage:
-student1 = Student("Alice")
-student1.add_grade(90)
-student1.add_grade(80)
-print(f"{student1.name}'s average: {student1.get_average()}")</code></pre>
-            </div>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-title">15. File System Inheritance</div>
-                    <div class="code-actions">
-                        <button onclick="copyCode(this)" title="Copy Code"><i class="fas fa-copy"></i></button>
-                        <button onclick="downloadCode(this, 'file-system-inheritance.py')" title="Download Code"><i class="fas fa-download"></i></button>
-                    </div>
-                </div>
-                <pre><code>class FSItem:
-    """Base class for a file system item."""
-    def __init__(self, name: str):
-        self.name = name
-
-    def get_info(self) -> str:
-        return self.name
-
-class File(FSItem):
-    """A file, which is an FSItem with a size."""
-    def __init__(self, name: str, size: int):
-        super().__init__(name)
-        self.size = size
-
-    def get_info(self) -> str:
-        return f"{super().get_info()}, Size: {self.size}"
-
-class Document(File):
-    """A document, which is a File with an author."""
-    def __init__(self, name: str, size: int, author: str):
-        super().__init__(name, size)
-        self.author = author
-    
-    def get_info(self) -> str:
-        return f"{super().get_info()}, Author: {self.author}"
-
-# Example Usage:
-doc = Document(name="report.txt", size=1024, author="Alice")
-print(doc.get_info())</code></pre>
-            </div>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-title">16. Polymorphic Logger</div>
-                    <div class="code-actions">
-                        <button onclick="copyCode(this)" title="Copy Code"><i class="fas fa-copy"></i></button>
-                        <button onclick="downloadCode(this, 'polymorphic-logger.py')" title="Download Code"><i class="fas fa-download"></i></button>
-                    </div>
-                </div>
-                <pre><code>def process_logs(loggers: list, message: str):
-    """
-    Iterates through a list of objects and calls the 'log' method on any
-    object that has one (duck typing).
-    """
-    for obj in loggers:
-        # Check if the object has a 'log' attribute and if that attribute is callable
-        if hasattr(obj, 'log') and callable(getattr(obj, 'log')):
-            obj.log(message)
-
-# Example Classes for Demonstration
-class FileLogger:
-    def log(self, msg: str):
-        print(f"File: {msg}")
-
-class DbLogger:
-    def log(self, msg: str):
-        print(f"DB: {msg}")
-
-class NotALogger:
-    pass
-
-# Example Usage:
-loggers_list = [FileLogger(), NotALogger(), DbLogger()]
-process_logs(loggers_list, "System startup")</code></pre>
-            </div>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-title">17. Transaction Ledger Class</div>
-                    <div class="code-actions">
-                        <button onclick="copyCode(this)" title="Copy Code"><i class="fas fa-copy"></i></button>
-                        <button onclick="downloadCode(this, 'transaction-ledger.py')" title="Download Code"><i class="fas fa-download"></i></button>
-                    </div>
-                </div>
-                <pre><code>class Ledger:
-    """A class to track a list of financial transactions."""
-    def __init__(self):
-        self._transactions = []
-
-    def add_transaction(self, amount: float):
-        """Adds a transaction amount to the ledger."""
-        self._transactions.append(amount)
-
-    def get_balance(self) -> float:
-        """Returns the sum of all transactions."""
-        return sum(self._transactions)
-
-    def get_negative_transactions(self) -> list:
-        """Returns a list of all transactions that are less than zero."""
-        return [t for t in self._transactions if t < 0]
-
-# Example Usage:
-ledger = Ledger()
-ledger.add_transaction(100.0)
-ledger.add_transaction(-25.5)
-ledger.add_transaction(-10.0)
-print(f"Current Balance: {ledger.get_balance()}")
-print(f"Negative Transactions: {ledger.get_negative_transactions()}")</code></pre>
-            </div>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-title">18. Premium User with Super()</div>
-                    <div class="code-actions">
-                        <button onclick="copyCode(this)" title="Copy Code"><i class="fas fa-copy"></i></button>
-                        <button onclick="downloadCode(this, 'premium-user.py')" title="Download Code"><i class="fas fa-download"></i></button>
-                    </div>
-                </div>
-                <pre><code>class User:
-    """A simple user class."""
-    def __init__(self, username: str):
-        self.username = username
-
-    def get_status(self) -> str:
-        return "Regular"
-
-class PremiumUser(User):
-    """A premium user that inherits from User."""
-    def __init__(self, username: str, tier: str):
-        super().__init__(username)  # Call the parent constructor
-        self.tier = tier
-
-    def get_status(self) -> str:
-        """Overrides the parent method to return the premium status."""
-        return f"Premium ({self.tier})"
-
-# Example Usage:
-user = User("guest")
-premium_user = PremiumUser("pro_user", "Gold")
-print(f"{user.username}'s status: {user.get_status()}")
-print(f"{premium_user.username}'s status: {premium_user.get_status()}")</code></pre>
-            </div>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-title">19. Dynamic Module-Based Calculator</div>
-                    <div class="code-actions">
-                        <button onclick="copyCode(this)" title="Copy Code"><i class="fas fa-copy"></i></button>
-                        <button onclick="downloadCode(this, 'module-calculator.py')" title="Download Code"><i class="fas fa-download"></i></button>
-                    </div>
-                </div>
-                <pre><code>
-This problem requires two files.
-
-File 1: operations.py
-
-# File: operations.py
-
-def add(a, b):
-    """Returns the sum of a and b."""
-    return a + b
-
-def subtract(a, b):
-    """Returns the difference of a and b."""
-    return a - b
-
-File 2: main.py
-
-# File: main.py
-
-# Import specific functions from the operations module
-from operations import add, subtract
-
-# Use the imported functions
-result1 = add(10, 5)
-result2 = subtract(10, 5)
-
-print(f"Addition result: {result1}")
-print(f"Subtraction result: {result2}")</code></pre>
-            </div>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-title">20. Vending Machine State Management</div>
-                    <div class="code-actions">
-                        <button onclick="copyCode(this)" title="Copy Code"><i class="fas fa-copy"></i></button>
-                        <button onclick="downloadCode(this, 'vending-machine.py')" title="Download Code"><i class="fas fa-download"></i></button>
-                    </div>
-                </div>
-                <pre><code>class VendingMachine:
-    """
-    Manages the state and logic of a vending machine.
-    """
-    def __init__(self, inventory: dict):
-        self.inventory = inventory
-
-    def purchase(self, item_name: str, money: float) -> str:
-        """
-        Processes a purchase request.
-        Checks for item availability, stock, and sufficient funds.
-        """
-        # Check if item exists in inventory
-        if item_name not in self.inventory:
-            return f"Item '{item_name}' not available."
+        <div id="quizContent" class="quiz-content">
+            <div class="question-counter" id="questionCounter"></div>
+            <div class="question-text" id="questionText"></div>
+            <div class="options-container" id="optionsContainer"></div>
+            <div id="feedback" class="feedback" style="display: none;"></div>
+            <button id="nextButton" class="next-button" style="display: none;">Növbəti Sual</button>
+        </div>
+
+        <div id="resultsContainer" class="results-container" style="display: none;">
+            <h2 class="results-title">İmtahan Nəticəsi</h2>
+            <div id="scoreDisplay" class="score"></div>
+            <div id="wrongAnswers" class="wrong-answers"></div>
+            <button id="restartButton" class="restart-button">Yenidən Başla</button>
+        </div>
+    </div>
+
+    <script>
+         const questions = [
+             {
+                    question: "Azərbaycan BMMT hansı tarixdə üzv olub?",
+                    options: ["18.04.1992", "01.03.1993", "03.11.1993", "21.10.1994"],
+                    correct: 2
+                },
+                {
+                    question: "\"MM haqqında AR-nın Qanunu\" hansı tarixdə və neçə saylı fərman ilə tətbiq edilmişdir?",
+                    options: ["29.09.1992-193", "31.07.1992-73", "18.04.1998-700", "19.12.1997-75"],
+                    correct: 2
+                },
+                {
+                    question: "Mülki Müdafiə Təşkilatı (Cenevrə Regionu Asosassiyası) kim tərəfindən və neçənci ildə yaradılıb?",
+                    options: ["Corc Henri 1936", "Corc Sant Pol 1931", "Corc Buş 1988", "Corc Santa Klaus 1931"],
+                    correct: 1
+                },
+                {
+                    question: "Ərazi prinsipi nə deməkdir?",
+                    options: ["MM tədbirlərinin obyektlərdə təşkil edilməsi", "MM tədbirlərinin şəhərdə təşkil edilməsi", "MM tədbirlərinin respublikada təşkil edilməsi", "MM tədbirlərinin regionda təşkil edilməsi"],
+                    correct: 2
+                },
+                {
+                    question: "Kütləvilik və məcburilik prinsipi nə deməkdir?",
+                    options: ["Mülki müdafiə tədbirlərinin bölgələrin əhalisini əhatə etməsi və məcburi xarakter daşıması", "Mülki müdafiə tədbirlərinin şəhərlərin əhalisini əhatə etməsi və məcburi xarakter daşıması.", "Mülki müdafiə tədbirlərinin AR-in bütün əhalisini əhatə etməsi və məcburi xarakter daşıması", "Mülki müdafiə tədbirlərinin kənd və qəsəbələrin əhalisini əhatə etməsi və məcburi xarakter daşıması."],
+                    correct: 2
+                },
+                {
+                    question: "Fərqli və kompleks yanaşma prinsipi nə deməkdir?",
+                    options: ["AR-da mülki müdafiə tədbirlərinin ayrı-ayrı bölgələrin, şəhərlərin, istehsal və sosial təyinatlı obyektlərin hərbistrateji, iqtisadi və digər xüsusiyyətləri nəzərə alınmaqla planlaşdırılması və həyata keçirilməsi", "AR-da mülki müdafiə tədbirlərinin istehsal və sosial təyinatlı obyektlərin iqtisadi və digər xüsusiyyətləri nəzərə alınmaqla planlaşdırılması və həyata keçirilməsi", "AR-da mülki müdafiə tədbirlərinin ayrı-ayrı Nazirliklərin hərbistrateji xüsusiyyətləri nəzərə alınmaqla planlaşdırılması və həyata keçirilməsi", "AR-da mülki müdafiə tədbirlərinin rayonların sosial təyinatlı obyektlərin əhali sayı və digər xüsusiyyətləri nəzərə alınmaqla planlaşdırılması və həyata keçirilməsi"],
+                    correct: 0
+                },
+                {
+                    question: "Qarşılıqlı əlaqə prinsipi nə deməkdir?",
+                    options: ["MM-nin təmin edilməsində iştirak edən AR-nın Daxili İşlər Nazirliyi və mülki müdafiə qüvvələrinin sıx və uzlaşdırılmış fəaliyyət göstərməsi", "MM-nin təmin edilməsində iştirak edən AR-nın orqanlarının və xarici qüvvələrin sıx və uzlaşdırılmış fəaliyyət göstərməsi", "MM-nin təmin edilməsində iştirak edən AR-nın Müdafiə Nazirliyinin və mülki müdafiə qüvvələrinin sıx və uzlaşdırılmış fəaliyyət göstərməsi", "MM-nin təmin edilməsində iştirak edən AR-nın orqanlarının və mülki müdafiə qüvvələrinin sıx və uzlaşdırılmış fəaliyyət göstərməsi"],
+                    correct: 3
+                },
+                {
+                    question: "Daimi hazırlıq prinsipi nə deməkdir?",
+                    options: ["AR-nın icra hakimiyyəti orqanlarının fövqəladə hadisələr zamanı dərhal və səmərəli fəaliyyətə başlamağa hazır vəziyyətdə olması", "AR-nın mülki müdafiə sisteminin fövqəladə hadisələr zamanı dərhal və səmərəli fəaliyyətə başlamağa hazır vəziyyətdə olması", "AR-nın yanğından mühafizə xidmətinin fövqəladə hadisələr zamanı dərhal və səmərəli fəaliyyətə başlamağa hazır vəziyyətdə olması", "AR-nın müdafiə sənaye sisteminin fövqəladə hadisələr zamanı dərhal və səmərəli fəaliyyətə başlamağa hazır vəziyyətdə olması"],
+                    correct: 1
+                },
+                {
+                    question: "İdarəetmənin mahiyyəti nədir?",
+                    options: ["Fəlakət zonasında yerləşən əhaliyə daim rəhbərlik etmək onların fəalliyyətini qarşıda duran vəzifənin icrasına yönəltməkdən ibarətdir.", "MM-nin hərbiləşdirilmiş dəstələrinə rəhbərlik etmək vəzifənin icrasına yönəltməkdən ibarətdir.", "Hüquq mühafizə orqanlarına rəhbərlik etmək, vəzifənin icrasına yönəltməkdən ibarətdir.", "MM rəhbər və qərargahının özlərinə tabe olan qüvvələrə daim rəhbərlik etməsindən, onların fəalliyyətini qarşıda duran vəzifənin icrasına yönəltməkdən ibarətdir."],
+                    correct: 3
+                },
+                {
+                    question: "Bunlardan hansı idarəetmənin tələblərinə aid edilmir?",
+                    options: ["Çevik olmalı", "Dayanaqlı olmalı", "Sərt olmalı", "Qətiyyətli olmalı"],
+                    correct: 2
+                },
+                {
+                    question: "Yardımçı idarəetmə məntəqəsi nə vaxt yaradılır?",
+                    options: ["Əsas məntəqəyə ehtiyac olmayanda yaradılır", "Əhali köçürülən zaman onlara rəhbərlik etmək üçün nəqliyyat vasitələrində yaradılır", "Bütün tədbirlərə bir əsas məntəqədən rəhbərlik etmək mümkün olmayan hallarda yaradılır", "FH baş verən ərazidə rəhbər işçilərin sayı çox olduğu halda yaradılır"],
+                    correct: 2
+                },
+                {
+                    question: "Səyyar idarəetmə məntəqəsi harada yaradılır?",
+                    options: ["Yeni tikilmiş binada", "Nəqliyyat vasitələrində", "Zirzəmidə", "Metro stansiyada"],
+                    correct: 1
+                },
+                {
+                    question: "Fövqəladə hadisələri cəm halda götürsək onları hansı növlərə bölmək olar?",
+                    options: ["Müqayisəli-müqayisəsiz", "Təbii-texnogen", "Münaqişəli-münaqişəsiz", "Təbii-ekoloji"],
+                    correct: 2
+                },
+                {
+                    question: "Münaqişəli fh hansı aid edilir?",
+                    options: ["Zəlzələ-vulkan", "Sosial partlayışlar-milli münaqişə", "Terror-daşqın", "Yanğın-Kimyəvi maddələrin yayılması"],
+                    correct: 1
+                },
+                {
+                    question: "Münaqişəsiz fh hansı aid edilir?",
+                    options: ["Təbii, Tikinti qəzaları, Milli münaqişə", "Texnogen, Ekoloji, Terrorizm", "Təbii, Texnogen, Ekoloji", "Sosial partlayışlar, Bioloji, Təbii"],
+                    correct: 2
+                },
+                {
+                    question: "Bunlardan hansı texnogen qəzalara aid edilmir?",
+                    options: ["İri miqyaslı nəqliyyat qəzaları", "Dəniz sularının səviyyəsinin qalxması", "Binaların qəflətən uçması", "AES qəzaları zamanı radiasiyanın yayılması"],
+                    correct: 1
+                },
+                {
+                    question: "Bunlardan hansı ekoloji xarakterli fh hansı aid edilmir?",
+                    options: ["Atmosferin tərkibi və xassələrinin dəyişməsi", "Yerin vəziyyətinin dəyişməsi", "Suyun səviyyəsinin qalxması", "Biosferin vəziyyətinin dəyişməsi"],
+                    correct: 2
+                },
+                {
+                    question: "Geofiziki fh hansı aid edilir?",
+                    options: ["Subasma, daşqın", "Zəlzələ, vulkan", "Qasırğa, fırtına", "Epizootiya, epifitotiya"],
+                    correct: 1
+                },
+                {
+                    question: "Geoloji fh hansı aid edilir?",
+                    options: ["Zəlzələ, vulkan", "Leysan, quraqlıq", "Sel, sürüşmə", "Terror, ekstremizm"],
+                    correct: 2
+                },
+                {
+                    question: "Meteoroloji fh hansı aid edilir?",
+                    options: ["Leysan, quraqlıq", "Zəlzələ, vulkan", "Sel, sürüşmə", "Yanğın, partlayış"],
+                    correct: 0
+                },
+                {
+                    question: "Bioloji fh hansılar aid edilir?",
+                    options: ["Yanğın", "Epiloqiya", "Epilepsiya", "Epifitotiya"],
+                    correct: 3
+                },
+                {
+                    question: "Təsir dairəsinə görə yerli fövqəladə hadisəyə hansı aid edilir?",
+                    options: ["FH bir neçə sənayə və ya kənd təsərrüfatı rayonlarını, bütünlüklə şəhəri və onun ətrafını əhatə edir", "FH ancaq yaşayış məntəqəsinin təkcə bir şəhərin və ya k/t müəssisənin ərazisində özünü göstərir", "FH bir ölkənin ərazisində məhdudlaşmır qonşu dövlətlərində əraziisinə yayılır", "FH bir bina daxilində məhdudlaşmır həyətyani ərazisinədə yayılır"],
+                    correct: 1
+                },
+                {
+                    question: "Təsir dairəsinə görə regional fövqəladə hadisəyə hansı aid edilir?",
+                    options: ["FH bir neçə sənayə və ya kənd təsərrüfatı rayonlarını, bütünlüklə şəhəri və onun ətrafını əhatə edir", "FH ancaq yaşayış məntəqəsinin təkcə bir şəhərin və ya k/t müəssisənin ərazisində özünü göstərir", "FH bir ölkənin ərazisində məhdudlaşmır qonşu dövlətlərində əraziisinə yayılır", "FH bir bina daxilində məhdudlaşmır həyətyani ərazisinədə çıxır"],
+                    correct: 0
+                },
+                {
+                    question: "Bunlardan hansı MM təliminin prinsiplərinə aid edilmir?",
+                    options: ["Təlimin fəallığı", "Daim hazırlıq", "Elmilik", "Bilik və vərdişlərə möhkəm yiyələnmək"],
+                    correct: 1
+                },
+                {
+                    question: "Əhaliyyə MM-nin öyrədilməsi neçə yaşdan başlayır?",
+                    options: ["5", "7", "9", "12"],
+                    correct: 1
+                },
+                {
+                    question: "MM-in tədrisi neçə ay davam edir?",
+                    options: ["6", "8", "10", "12"],
+                    correct: 2
+                },
+                {
+                    question: "Nüvə silahının zədələyici amilləri hansılardır?",
+                    options: ["Zərbə dalğası, işıq süalanması, nüfuzedici radiasiya, bioloji zəhərlənmə, elektromaqnit impuls", "Zərbə dalğası, lazer süalanması, nüfuzedici radiasiya, radioaktiv zəhərlənmə, elektromaqnit impuls", "Zərbə dalğası, işıq süalanması, elektron radiasiya, radioaktiv zəhərlənmə, elektromaqnit impuls", "Zərbə dalğası, nüfuzedici radiasiya, radioaktiv zəhərlənmə, işıq süalanması, elektromaqnit impuls"],
+                    correct: 3
+                },
+                {
+                    question: "Nüvə partlayış gücünün neçə faizi zərbə dalğasına düşür?",
+                    options: ["4", "10", "35", "50"],
+                    correct: 3
+                },
+                {
+                    question: "Nüvə partlayış gücünün neçə faizi işıq şualanmasına düşür?",
+                    options: ["50", "35", "10", "1"],
+                    correct: 1
+                },
+                {
+                    question: "Nüvə partlayış gücünün neçə faizi radioaktiv zəhərlənməyə düşür?",
+                    options: ["1", "10", "35", "50"],
+                    correct: 1
+                },
+                {
+                    question: "Qatı duman, yağış və qar İşıq şualanmasının təsirini neçə dəfə zəiflədir?",
+                    options: ["10-20", "40-50", "60-70", "90-100"],
+                    correct: 0
+                },
+                {
+                    question: "Nüfuzedici radiasiya nədir?",
+                    options: ["Nüvə partlayışı anında ətrafa yayılan işıq şüaları selidir", "Nüvə partlayışı anında ətrafa yayılan elektron selidir", "Nüvə partlayışı anında ətrafa yayılan gözə görünməyən qamma süalar və neytron selidir", "Nüvə partlayışı anında ətrafa yayılan gözə görünməyən qamma süalar və proton selidir"],
+                    correct: 2
+                },
+                {
+                    question: "Üstü örtülmüş xəndək nüfuzedici radiasiyanın təsirini neçə dəfə zəiflədir?",
+                    options: ["10", "40", "100", "400"],
+                    correct: 1
+                },
+                {
+                    question: "Mühafizə üçün uyğunlaşdırılmış zirzəmi nüfuzedici radiasiyasının təsirini neçə dəfə zəiflədir?",
+                    options: ["20", "100", "400", "1000"],
+                    correct: 2
+                },
+                {
         
-        item = self.inventory[item_name]
-        price = item['price']
-        stock = item['stock']
-
-        # Check if item is in stock
-        if stock <= 0:
-            return "Out of stock."
-
-        # Check if money is sufficient
-        if money < price:
-            return f"Insufficient funds. Price is ${price:.2f}."
-
-        # Process successful purchase
-        self.inventory[item_name]['stock'] -= 1
-        change = money - price
-        return f"Dispensing {item_name}. Your change is ${change:.2f}."
-
-# Example Usage:
-inventory_data = {
-    'cola': {'price': 1.50, 'stock': 2},
-    'chips': {'price': 1.00, 'stock': 10}
-}
-vm = VendingMachine(inventory_data)
-
-print(vm.purchase('cola', 2.00))
-print(vm.purchase('chips', 0.75))
-print(vm.purchase('cola', 1.50))
-print(vm.purchase('cola', 1.50)) # This should be out of stock</code></pre>
-            </div>
-        </div>
-    </main>
-
-    <script src="script.js"></script>
-</body>
-</html> 
